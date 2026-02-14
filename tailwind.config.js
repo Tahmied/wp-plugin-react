@@ -1,9 +1,12 @@
-export default {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./**/*.php",
+  ],
   corePlugins: {
-    preflight: false, 
+    preflight: false,
   },
-  prefix: 'tw-', 
+  important: "#my-plugin-root",
   theme: {
     extend: {},
   },
