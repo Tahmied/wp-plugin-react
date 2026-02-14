@@ -14,8 +14,7 @@ if (!defined('ABSPATH')) exit;
 
 function my_plugin_menu()
 {
-
-    $main_page = add_menu_page(
+    add_menu_page(
         'My Plugin',
         'My Plugin',
         'manage_options',
@@ -25,7 +24,7 @@ function my_plugin_menu()
         6
     );
 
-    $sub_page = add_submenu_page(
+    add_submenu_page(
         'my-plugin-dashboard',
         'Settings',
         'Settings',
@@ -33,36 +32,33 @@ function my_plugin_menu()
         'my-plugin-settings',
         'my_plugin_render_app'
     );
-
-    add_action('load-' . $main_page, 'my_plugin_enqueue_assets');
-    add_action('load-' . $sub_page, 'my_plugin_enqueue_assets');
 }
 add_action('admin_menu', 'my_plugin_menu');
 
-function my_plugin_enqueue_assets()
+function my_admin_assets($hook)
 {
-    $asset_file = include(plugin_dir_path(__FILE__) . 'build/index.asset.php');
+
+    // load only on your plugin page if you want
+    if (strpos($hook, 'my-plugin') === false) {
+        return;
+    }
 
     wp_enqueue_script(
-        'my-plugin-js',
-        plugins_url('build/index.js', __FILE__),
-        $asset_file['dependencies'],
-        $asset_file['version'],
+        'my-admin',
+        plugin_dir_url(__FILE__) . 'build/admin.js',
+        [],
+        filemtime(plugin_dir_path(__FILE__) . 'build/admin.js'),
         true
     );
 
     wp_enqueue_style(
-        'my-plugin-css',
-        plugins_url('build/index.css', __FILE__),
-        array(),
-        $asset_file['version']
+        'my-admin',
+        plugin_dir_url(__FILE__) . 'build/admin.css',
+        [],
+        filemtime(plugin_dir_path(__FILE__) . 'build/admin.css')
     );
-
-    $current_screen = get_current_screen();
-    wp_localize_script('my-plugin-js', 'myPluginConfig', array(
-        'page' => $current_screen->id,
-    ));
 }
+add_action('admin_enqueue_scripts', 'my_admin_assets');
 
 function my_plugin_render_app()
 {
